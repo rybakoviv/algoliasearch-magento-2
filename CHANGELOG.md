@@ -1,5 +1,91 @@
 # CHANGE LOG
 
+## 3.9.1
+
+### UPDATES
+- Refactored the Autocomplete to provide an extensible model for function-based templates by utilizing tagged template literals. The approach supports the use of RequireJS mixins for overriding the template functionality. 
+- Update the synonym area notice in the Magento admin to point customers to use the Algolia dashboard for Synonym management as Magento Dashboard will be deprecated in a future release
+- Refactored the casting Attributes
+- Managing Max record size via the admin
+
+
+### FIXES
+- Autocomplete category links not preselecting facets on the target URL
+- Fixed bug related to conjunctive facets and adaptive images in autocomplete
+- Fixed issue with showing __empty__ in the url if autocomplete was disabled 
+- Fixed autocomplete suggestions
+- Instant search fixes when the price was set to retrievable = 'no'
+- Price attribute fixes in autocomplete when the price attribute is set to Non-Retrievable
+- Add to cart triggering duplicate view event for the Algolia recommend products
+- Issues while saving and loading data by the wrong cache key for the popular queries
+- Issues with max_retries in clear old jobs function in the queue
+- Place Order duplicate Conversion issue for Grouped Product
+- Fixes issues with store-specific category index
+
+
+
+## 3.9.0
+
+### New Features
+- Trends Recommendations: We have added the ability to add Trending Items to the PDP and the shopping cart page. More information can be found <a href="https://www.algolia.com/doc/integration/magento-2/how-it-works/recommend/?client=php#trending-items">here</a>. We also provide a <a href="https://www.algolia.com/doc/integration/magento-2/how-it-works/recommend/?client=php#configure-the-trending-items-widget">Trending Items widget</a> that can be used to add Trending Items to any page.
+- Added an option to show Recommend Related and Frequently Bought Together products on the shopping cart page.
+- Added an option to enable the Add To Cart button for all types of recommended products (Related, Frequently Bought Together, and Trending Items).
+- Added Algolia Recommend dashboard link on the Magento dashboard
+- Added Algolia Search extensions release notes link in the Magento admin to be able to access release notes easily.
+- Implemented Recommended Product click event using personalization.
+
+### UPDATES
+- Refactored the Algolia Insight functionality in the extension code base per Magento standard (moved the observer directory in the module root).
+- Refactored the autocomplete 2.0 code to make it more developer-friendly to allow for customization per customer needs.
+- Collated all autocomplete-specific logic in a single autocomplete.js file and segregated JS-based templates that control the layout of the different autocomplete sources to be more developer-friendly. This enables the customers to easily override the layout of the autocomplete menu in the custom theme and the extension.
+
+
+### FIXES
+- Click event in autocomplete
+- Autocomplete errors if the product is not assigned a category and indexed into Algolia
+- Issues with the price attribute in autocomplete when price attribute is set to Non-Retrievable
+- The autocomplete in Query merchandiser (in the Magento admin) shows products from the default store on switching stores [Fixed]
+- Issues with triggering Add to Cart Conversion for Configurable Product
+- Issues with indexer not updating when product goes out of stock when the last of the inventory is done
+
+
+## 3.8.1
+
+### UPDATES
+- Updated the system configuration message for Click & Conversion Analytics 
+- Added validation in synonyms upload section (for Algolia Search) in the Magento admin(#1226)
+- Updated code to set "Filter Only" facets via the instantsearch/facets settings in the Magento admin panel(#1224)
+- Updated CSR policy to fix content security error for insights.io(#1228)
+
+### FIXES
+- Fixed the InstantSearch variant image issue(#1223)
+- Fixed the proper case for 'Related Products' in comment Magento Admin (#1221)
+- Fixed the code deploy error if the DB has tables with Prefix - patch not applied(#1229)
+- Fixed the Remove trailing ? url in category page(#1222)
+
+## 3.8.0
+
+### New Features
+- Added Algolia Recommend(#1212)
+
+### UPDATES
+- Updated Autocomplete V1.6.3 (#1217)
+
+### FIXES
+- Fixed the analytics dashboard issue in the magento admin(#1215)
+- Fixed the compatibility issue with landing page (#1216)
+- Fixed the issue with in_numeric in search suggestion indexing(#1218)
+
+## 3.7.0
+
+### UPDATES
+- Updated instantsearch.js(#1203)
+
+### FIXES
+- Fixed the autocomplete.js vulnerability issues (#1205)
+- Fixed the issue with PHP 8.1: Deprecated Functionality: explode() on category page (#1208)
+- Fixed the issue with Mview update by patch (#1210)
+
 ## 3.6.1
 
 ### UPDATES

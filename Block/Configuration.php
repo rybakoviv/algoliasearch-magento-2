@@ -40,6 +40,8 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
 
         $categoryHelper = $this->getCategoryHelper();
 
+        $suggestionHelper = $this->getSuggestionHelper();
+
         $productHelper = $this->getProductHelper();
 
         $algoliaHelper = $this->getAlgoliaHelper();
@@ -55,6 +57,11 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
         $customerGroupId = $this->getGroupId();
 
         $priceKey = $this->getPriceKey();
+        $priceGroup = null;
+        if ($config->isCustomerGroupsEnabled()) {
+            $pricegroupArray = explode('.', $priceKey);
+            $priceGroup = $pricegroupArray[2];
+        }
 
         $query = '';
         $refinementKey = '';
@@ -157,6 +164,24 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
                 'query' => $this->getLandingPageQuery(),
                 'configuration' => $this->getLandingPageConfiguration(),
             ],
+            'recommend' => [
+                'enabledFBT' => $config->isRecommendFrequentlyBroughtTogetherEnabled(),
+                'enabledRelated' => $config->isRecommendRelatedProductsEnabled(),
+                'enabledFBTInCart' => $config->isRecommendFrequentlyBroughtTogetherEnabledOnCartPage(),
+                'enabledRelatedInCart' => $config->isRecommendRelatedProductsEnabledOnCartPage(),
+                'limitFBTProducts' => $config->getNumberOfFrequentlyBoughtTogetherProducts(),
+                'limitRelatedProducts' => $config->getNumberOfRelatedProducts(),
+                'limitTrendingItems' => $config->getNumberOfTrendingItems(),
+                'enabledTrendItems' => $config->isRecommendTrendingItemsEnabled(),
+                'trendItemFacetName' => $config->getTrendingItemsFacetName(),
+                'trendItemFacetValue' => $config->getTrendingItemsFacetValue(),
+                'isTrendItemsEnabledInPDP' => $config->isTrendItemsEnabledInPDP(),
+                'isTrendItemsEnabledInCartPage' => $config->isTrendItemsEnabledInShoppingCart(),
+                'isAddToCartEnabledInFBT' => $config->isAddToCartEnabledInFrequentlyBoughtTogether(),
+                'isAddToCartEnabledInRelatedProduct' => $config->isAddToCartEnabledInRelatedProducts(),
+                'isAddToCartEnabledInTrendsItem' => $config->isAddToCartEnabledInTrendsItem(),
+                'addToCartParams' => $addToCartParams,
+            ],
             'extensionVersion' => $config->getExtensionVersion(),
             'applicationId' => $config->getApplicationID(),
             'indexName' => $coreHelper->getBaseIndexName(),
@@ -182,11 +207,15 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
             'removeBranding' => (bool) $config->isRemoveBranding(),
             'productId' => $productId,
             'priceKey' => $priceKey,
+            'priceGroup' => $priceGroup,
+            'origFormatedVar' => 'price' . $priceKey . '_original_formated',
+            'tierFormatedVar' => 'price' . $priceKey . '_tier_formated',
             'currencyCode' => $currencyCode,
             'currencySymbol' => $currencySymbol,
             'priceFormat' => $priceFormat,
             'maxValuesPerFacet' => (int) $config->getMaxValuesPerFacet(),
             'autofocus' => true,
+            'resultPageUrl' => $this->getCatalogSearchHelper()->getResultUrl(),
             'request' => [
                 'query' => html_entity_decode($query),
                 'refinementKey' => $refinementKey,
@@ -199,10 +228,10 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
             'showCatsNotIncludedInNavigation' => $config->showCatsNotIncludedInNavigation(),
             'showSuggestionsOnNoResultsPage' => $config->showSuggestionsOnNoResultsPage(),
             'baseUrl' => $baseUrl,
-            'popularQueries' => $config->getPopularQueries(),
+            'popularQueries' => $suggestionHelper->getPopularQueries($this->getStoreId()),
             'useAdaptiveImage' => $config->useAdaptiveImage(),
             'urls' => [
-                'logo' => $this->getViewFileUrl('Algolia_AlgoliaSearch::images/search-by-algolia.svg'),
+                'logo' => $this->getViewFileUrl('Algolia_AlgoliaSearch::images/algolia-logo-blue.svg'),
             ],
             'ccAnalytics' => [
                 'enabled' => $config->isClickConversionAnalyticsEnabled(),
@@ -279,17 +308,15 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
 
         $transport = new DataObject($algoliaJsConfig);
         $this->_eventManager->dispatch('algolia_after_create_configuration', ['configuration' => $transport]);
-        $algoliaJsConfig = $transport->getData();
-
-        return $algoliaJsConfig;
+        return $transport->getData();
     }
 
-    private function areCategoriesInFacets($facets)
+    protected function areCategoriesInFacets($facets)
     {
         return in_array('categories', array_column($facets, 'attribute'));
     }
 
-    private function getUrlTrackedParameters()
+    protected function getUrlTrackedParameters()
     {
         $urlTrackedParameters = ['query', 'attribute:*', 'index'];
 
@@ -300,7 +327,7 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
         return $urlTrackedParameters;
     }
 
-    private function getOrderedProductIds(ConfigHelper $configHelper, Http $request)
+    protected function getOrderedProductIds(ConfigHelper $configHelper, Http $request)
     {
         $ids = [];
 
@@ -323,22 +350,22 @@ class Configuration extends Algolia implements CollectionDataSourceInterface
         return $ids;
     }
 
-    private function isLandingPage()
+    protected function isLandingPage()
     {
         return $this->getRequest()->getFullActionName() === 'algolia_landingpage_view';
     }
 
-    private function getLandingPageId()
+    protected function getLandingPageId()
     {
         return $this->isLandingPage() ? $this->getCurrentLandingPage()->getId() : '';
     }
 
-    private function getLandingPageQuery()
+    protected function getLandingPageQuery()
     {
         return $this->isLandingPage() ? $this->getCurrentLandingPage()->getQuery() : '';
     }
 
-    private function getLandingPageConfiguration()
+    protected function getLandingPageConfiguration()
     {
         return $this->isLandingPage() ? $this->getCurrentLandingPage()->getConfiguration() : json_encode([]);
     }

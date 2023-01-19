@@ -10,7 +10,11 @@ $catalogSearchHelper = $block->getCatalogSearchHelper();
 $placeholder = __('Search for products, categories, ...');
 
 // Render form with autocomplete input
-if ($config->isDefaultSelector()) : ?>
+if ($config->isAutoCompleteEnabled()) :
+    if ($config->isDefaultSelector()) : ?>
+        <div id="algoliaAutocomplete" class="block block-search algolia-search-block algolia-search-input"></div>
+<?php endif; ?>
+<?php else : ?>
 <div class="block block-search algolia-search-block">
     <div class="block block-title"><strong><?php echo $block->escapeHtml(__('Search')); ?></strong></div>
     <div class="block block-content">
@@ -29,7 +33,7 @@ if ($config->isDefaultSelector()) : ?>
                        autocorrect="off"
                        autocapitalize="off"
                        placeholder="<?php echo $block->escapeHtml($placeholder); ?>"
-                       />
+                />
 
                 <span class="clear-cross clear-query-autocomplete"></span>
                 <button id="algolia-glass"
